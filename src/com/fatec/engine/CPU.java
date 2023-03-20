@@ -1,13 +1,14 @@
 package com.fatec.engine;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CPU {
-	private Processo curProcess;
-	public static LinkedList<Processo> processqueue;
+	public static Processo curProcess;
+	public static ArrayList<Processo> processqueue;
 	
 	public CPU() {
-		processqueue = new LinkedList<Processo>();
+		processqueue = new ArrayList<Processo>();
 	}
 	
 	public void addProcesso(Processo p) {
@@ -16,9 +17,10 @@ public class CPU {
 	
 	public void execute() {
 		if(processqueue.size() > 0) {
-			curProcess = processqueue.getFirst();
-			processqueue.remove(curProcess);
-			curProcess.start();
+			if(curProcess == null) {
+				curProcess = processqueue.get(0);
+				curProcess.start();
+			}
 		}
 	}
 	

@@ -13,7 +13,11 @@ public class Processo implements Runnable {
 			System.out.println("CPU " + index + ":" + " Iniciou um Processo");
 			thread.sleep(1000);
 			System.out.println("CPU " + index + ":" + " Finalizou um Processo");
-			thread.join();
+			if(CPU.curProcess == this) {
+				CPU.processqueue.remove(this);
+				CPU.curProcess = null;
+				thread.join();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

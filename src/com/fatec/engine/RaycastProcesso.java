@@ -34,8 +34,11 @@ public class RaycastProcesso extends Processo {
 				Simulacao.Px -= Simulacao.Pdx;
 				Simulacao.Py -= Simulacao.Pdy;
 			}
-			
-			thread.interrupt();
+			if(CPU.curProcess == this) {
+				CPU.processqueue.remove(this);
+				CPU.curProcess = null;
+				thread.interrupt();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -14,11 +14,13 @@ import javax.swing.JFrame;
 
 import com.fatec.utils.Raycast;
 
-public class Simulacao extends Canvas implements Runnable, KeyListener {
 	
-	/**
-	 * 
-	 */
+/**
+* @author Fenekito
+*/
+
+public class Simulacao extends Canvas implements Runnable, KeyListener {
+    
 	private static final long serialVersionUID = 1L;
 	public static int width = 1024;
 	public static int height = 512;
@@ -33,7 +35,7 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 		
 	JFrame frame;
 	
-	CPU cpus[] = new CPU[4];
+	public static CPU cpus[] = new CPU[4];
 	public static int cpuIndex = 0;
 		
 	public static boolean up, down, left, right;
@@ -47,7 +49,7 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 	public double P2 = Math.PI/2;
 	public double P3 = 3*Math.PI/2;
 	public double DR = 0.0174533;
-	
+        	
 	public static int map[] = 
 		{
 			1,1,1,1,1,1,1,1,
@@ -106,11 +108,14 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 		}
 		Graphics2D g2 = (Graphics2D) image.createGraphics();
 				
-		g2.setColor(Color.black.brighter());
+		g2.setColor(Color.blue);
 		g2.fillRect(0,0, width, height);
-		
-		raycast.drawRay2D(g2);
-		
+                
+                g2.setColor(Color.yellow);
+                for(int i = 0; i < cpus.length; i++) {
+                    g2.drawString("CPU: " + i + "\n" + "Processos: " + cpus[i].processqueue.size(), 16, 24 + (i+1) * 32);
+                }
+                
 		g2 = (Graphics2D) bs.getDrawGraphics();
 		
 		g2.drawImage(image, 0, 0, width, height, null);
@@ -151,7 +156,11 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 		}stop();
 		
 	}
-	
+	/**
+         * Inicializa uma Janela
+         * 
+         * 
+         **/
 	public void initFrame() {
 		
 		setPreferredSize(s);
@@ -174,7 +183,6 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 		thread = new Thread(this);
 		isRunning = true;
 		thread.start();
-		
 	}
 	
 	public synchronized void stop() {
@@ -193,7 +201,7 @@ public class Simulacao extends Canvas implements Runnable, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		cpus[cpuIndex].addProcesso(new RaycastProcesso());
+		cpus[cpuIndex].addProcesso(new Processo(cpus[cpuIndex]));
 		cpuIndex++;
 		if(cpuIndex > 3) {
 			cpuIndex = 0;

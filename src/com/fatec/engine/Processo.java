@@ -2,22 +2,25 @@ package com.fatec.engine;
 
 public class Processo implements Runnable {
 	protected Thread thread;
-	public void Processo() {
-		start();
+        private CPU parent;
+        
+	public Processo(CPU cpu) {
+            parent = cpu;
+            start();
 	}
 	
 	@Override
 	public void run() {
 		try {
 			int index = Simulacao.cpuIndex;
-			System.out.println("CPU " + index + ":" + " Iniciou um Processo");
-			thread.sleep(1000);
-			System.out.println("CPU " + index + ":" + " Finalizou um Processo");
-			if(CPU.curProcess == this) {
-				CPU.processqueue.remove(this);
-				CPU.curProcess = null;
-				thread.join();
-			}
+			thread.sleep(5000);
+                        if(!parent.processqueue.isEmpty()) {
+                            if(parent.curProcess != null && parent.curProcess == this) {
+                                parent.processqueue.remove(this);
+                                parent.curProcess = null;
+                                thread.join();
+                            }
+                        }
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

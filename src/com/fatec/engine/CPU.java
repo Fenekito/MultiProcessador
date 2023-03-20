@@ -1,11 +1,10 @@
 package com.fatec.engine;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class CPU {
-	public static Processo curProcess;
-	public static ArrayList<Processo> processqueue;
+	public Processo curProcess;
+	public ArrayList<Processo> processqueue;
 	
 	public CPU() {
 		processqueue = new ArrayList<Processo>();

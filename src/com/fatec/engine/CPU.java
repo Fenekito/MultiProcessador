@@ -10,7 +10,7 @@ public class CPU {
 		processqueue = new ArrayList<Processo>();
 	}
 	
-	public void addProcesso(Processo p) {
+	public void addProcess(Processo p) {
 		processqueue.add(p);
 	}
 	
@@ -23,7 +23,7 @@ public class CPU {
 		}
 	}
 	
-	public Processo getProcesso(int index) {
+	public Processo getProcess(int index) {
 		return processqueue.get(index);
 	}
 }

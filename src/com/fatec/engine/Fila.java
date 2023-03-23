@@ -1,10 +1,10 @@
 package com.fatec.engine;
 
 import com.fatec.engine.interfaces.Administravel;
+import com.fatec.engine.interfaces.ProcessoHandler;
 
-public abstract class Fila implements Administravel {
-	//TODO: adicionar suporte para pausar fila e retomar fila quando necessário
-	public abstract void execute();
+public abstract class Fila implements Administravel, ProcessoHandler {
+	public abstract void executar();
 
 	//TODO: adicionar atributo que contenha o processo atual. NOME SUGERIDO: processoAtual (não sei se precisa ser aqui, na classe abstrata)
 

@@ -3,8 +3,9 @@ package com.fatec.engine;
 import java.util.ArrayList;
 
 import com.fatec.engine.interfaces.Administravel;
+import com.fatec.engine.interfaces.ProcessoHandler;
 
-public class CPU implements Administravel {
+public class CPU implements Administravel, ProcessoHandler {
 
 	private Fila[] filas = new Fila[5];
 	//TODO: adicionar um atributo que indique o processo atual, ele deve ser modificável pelas filas. NOME SUGERIDO: private Processo processoAtual
@@ -19,6 +20,8 @@ public class CPU implements Administravel {
 	/*
 		TODO: adicionar uma função que checa qual é a fila com maior prioridade que possui processos. essa função deve identificar tal fila e, se a prioridade atual for diferente da do processo que já está em execução, pausar a fila atual e executar a fila que tenha maior prioridade
 	*/
+
+  
 
 	@Override
 	public int countProcessos() {

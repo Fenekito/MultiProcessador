@@ -1,23 +1,22 @@
 package com.fatec.engine;
 
 import java.util.Comparator;
+import java.util.UUID;
 
 import com.fatec.engine.enums.Prioridade;
+import com.fatec.engine.interfaces.ProcessoHandler;
 
 public class Processo implements Runnable {
-  //TODO: tornar essa classe pausável, de uma maneira em que a fila possa controlar quando o processo roda ou não
-
-  //TODO: receber um event handler de Fila (um possível delegado) que será executado assim que o processo terminar. NOME SUGERIDO: onProcessoFinalizado()
 	protected Thread thread;
-	
-	private CPU parent;
-
 	public int tempoEstimado;
-	
 	public Prioridade prioridade = Prioridade.SECONDARY;
-        
-	public Processo(CPU cpu) {
-		parent = cpu;
+	public UUID id;
+	private ProcessoHandler _handler;
+
+	public Processo(ProcessoHandler handler, int tempoEstimado) {
+		_handler = handler;
+		this.tempoEstimado = tempoEstimado;
+		id = UUID.randomUUID();
 		start();
 	}
 	
@@ -35,20 +34,14 @@ public class Processo implements Runnable {
 	
 	@Override
 	public void run() {
-    //TODO: remover o código desnecessário (a checagem de processqueue e etc.)
 		try {
-			int index = Simulacao.cpuIndex;
-			thread.sleep(5000);
-			if(!parent.processqueue.isEmpty()) {
-				if(parent.curProcess != null && parent.curProcess == this) {
-					parent.processqueue.remove(this);
-					parent.curProcess = null;
-					thread.join();
-				}
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
+			thread.sleep(tempoEstimado);
+			thread.join();
+		} catch (Exception e) {
+			_handler.onInterrompido(this);
 		}
+
+		_handler.onFinalizado(this);
 	}
 	
 	public synchronized void start() {

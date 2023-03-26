@@ -7,45 +7,73 @@ import com.fatec.engine.enums.Prioridade;
 import com.fatec.engine.interfaces.ProcessoHandler;
 
 public class Processo implements Runnable {
-	protected Thread thread;
-	public int tempoEstimado;
 	public Prioridade prioridade = Prioridade.SECONDARY;
 	public UUID id;
+	private long tempoEstimado;
+	private long tempoDecorrido;
 	private ProcessoHandler _handler;
 
-	public Processo(ProcessoHandler handler, int tempoEstimado) {
+	public Processo(ProcessoHandler handler, long tempoEstimado) {
 		_handler = handler;
 		this.tempoEstimado = tempoEstimado;
+		tempoDecorrido = 0;
 		id = UUID.randomUUID();
-		start();
+	}
+
+	public long getTempoRestante() {
+		return tempoEstimado - tempoDecorrido;
 	}
 	
 	public static Comparator<Processo> priorityComparator = new Comparator<Processo>() {
 		
 		@Override
 		public int compare(Processo p0, Processo p1) {
-			if(p0.prioridade.compareTo(p1.prioridade) > 0){
-				return 1;
-			} else {
-				return -1;
-			}
+			int prioridadeP0 = p0.prioridade.toInt();
+			int prioridadeP1 = p1.prioridade.toInt();
+
+			int diferenca = prioridadeP0 - prioridadeP1;
+
+			return diferenca != 0
+				? diferenca / Math.abs(diferenca)
+				: 0;
 		}
+
 	};
+
+	@Override
+	public boolean equals(Object objeto) {
+		if (objeto == null) {
+            return false;
+        }
+
+        if (!(objeto instanceof Processo)) {
+            return false;
+        }
+
+        Processo processo = (Processo)objeto;
+        return processo.id.equals(id);
+	}
 	
 	@Override
 	public void run() {
+		long timestampInicio = System.nanoTime();
+
 		try {
-			thread.sleep(tempoEstimado);
-			thread.join();
+			Thread.sleep(getTempoRestante());
 		} catch (Exception e) {
+			long timestampPausa = System.nanoTime();
+			long tempoDecorridoAtePausa = timestampPausa - timestampInicio;
+
+			tempoDecorrido += tempoDecorridoAtePausa;
+
 			_handler.onInterrompido(this);
+			return;
 		}
 
+		long timestampFim = System.nanoTime();
+		long tempoDecorridoAteTermino = timestampFim - timestampInicio;
+		tempoDecorrido += tempoDecorridoAteTermino;
+
 		_handler.onFinalizado(this);
-	}
-	
-	public synchronized void start() {
-		thread = new Thread(this);
-		thread.start();
 	}
 }

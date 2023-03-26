@@ -1,19 +1,123 @@
 package com.fatec.engine;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 import com.fatec.engine.interfaces.Administravel;
+import com.fatec.engine.interfaces.FilaHandler;
 import com.fatec.engine.interfaces.ProcessoHandler;
 
-public abstract class Fila implements Administravel, ProcessoHandler {
-	public abstract void executar();
+public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 
-	//TODO: adicionar atributo que contenha o processo atual. NOME SUGERIDO: processoAtual (não sei se precisa ser aqui, na classe abstrata)
+	private FilaHandler _handler;
+	protected Thread threadAtual;
+	protected ArrayList<Processo> processos;
+	protected boolean rodando; 
+	public UUID id;
 
-	//TODO: adicionar event handler que seja chamado pelo processo assim que ele esteja finalizado. NOME SUGERIDO: onProcessoFinalizado()
+	public Fila(FilaHandler handler) {
+		id = UUID.randomUUID();
+		_handler = handler;
+		rodando = false;
+		processos = new ArrayList<Processo>();
+	}
 
-	//TODO: possivelmente adicionar um método privado para decidir o processo atual da fila. colocar aqui somente a tipagem do método, deixando as implementações para as classes que herdarem essa
+	public void iniciar() {
+		rodando = true;
+		executarProximoProcesso();
+	}
 
+	public void pausar() {
+		rodando = false;
+		threadAtual.interrupt();
+		threadAtual = null;
+	}
+	
+	public boolean estaRodando() {
+		return rodando;
+	}
+
+	protected void executar(Processo processo) {
+		_handler.onNovoProcesso(processo);
+		threadAtual = new Thread(processo);
+		threadAtual.start();
+	}
+
+	//identifica qual será o próximo processo e executa ele
+	public void executarProximoProcesso() {
+		Processo proximoProcesso = getProximoProcesso();
+
+		//caso nenhum próximo processo seja encontrado, avisa o FilaHandler injetado que não há mais processos na fila e retorna
+		if (proximoProcesso == null) {
+			_handler.onEsvaziada();
+			return;
+		}
+
+		executar(proximoProcesso);
+	}
+		
 	public static <T1 extends Fila, T2 extends Fila> T2 trocarAlgoritmo(T1 fila, T2 novaFila) {
 		novaFila.addProcessos(fila.getProcessos());
 		return novaFila;
 	}
+	
+	@Override
+	public boolean equals(Object objeto) {
+		if (objeto == null) {
+            return false;
+        }
+
+        if (!(objeto instanceof Fila)) {
+            return false;
+        }
+
+        Fila fila = (Fila)objeto;
+        return fila.id.equals(id);
+	}
+
+	@Override
+	public void onFinalizado(Processo processo) {
+		//vai remover o processo atual
+		processos.remove(processo);
+
+		//caso haja um próximo processo, executa ele
+		executarProximoProcesso();
+	}
+
+	@Override
+	public Void addProcesso(Processo processo) {
+		processos.add(processo);
+		return null;
+	}
+
+	@Override
+	public Void addProcessos(ArrayList<Processo> processos) {
+		this.processos.addAll(processos);
+		return null;
+	}
+
+	@Override
+	public int countProcessos() {
+		return processos.size();
+	}
+
+	@Override
+	public long countTempoRestante() {
+		long tempoRestanteAcumulado = 0;
+
+		for (Processo processo : processos) {
+			tempoRestanteAcumulado += processo.getTempoRestante();
+		}
+
+		return tempoRestanteAcumulado;
+	}
+
+	@Override
+	public ArrayList<Processo> getProcessos() {
+		return processos;
+	}
+
+	//vai decidir o próximo processo que deve ser executado de acordo com o algoritmo da fila
+	protected abstract Processo getProximoProcesso();
+
 }

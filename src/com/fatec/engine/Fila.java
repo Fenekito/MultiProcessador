@@ -3,54 +3,65 @@ package com.fatec.engine;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.fatec.engine.enums.Prioridade;
 import com.fatec.engine.interfaces.Administravel;
 import com.fatec.engine.interfaces.FilaHandler;
 import com.fatec.engine.interfaces.ProcessoHandler;
 
 public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 
-	private FilaHandler _handler;
+	protected FilaHandler _handler;
 	protected Thread threadAtual;
+	protected Processo processoAtual;
 	protected ArrayList<Processo> processos;
 	protected boolean rodando; 
 	public UUID id;
+	public Prioridade prioridade;
 
-	public Fila(FilaHandler handler) {
+	public Fila(FilaHandler handler, Prioridade prioridade) {
 		id = UUID.randomUUID();
 		_handler = handler;
+		this.prioridade = prioridade;
 		rodando = false;
 		processos = new ArrayList<Processo>();
 	}
 
-	public void iniciar() {
+	public synchronized void iniciar() {
 		rodando = true;
 		executarProximoProcesso();
 	}
 
-	public void pausar() {
+	public synchronized void pausar() {
 		rodando = false;
 		threadAtual.interrupt();
 		threadAtual = null;
 	}
 	
-	public boolean estaRodando() {
+	public synchronized boolean estaRodando() {
 		return rodando;
 	}
 
-	protected void executar(Processo processo) {
+	protected synchronized void executar(Processo processo) {
 		_handler.onNovoProcesso(processo);
+		processoAtual = processo;
 		threadAtual = new Thread(processo);
 		threadAtual.start();
 	}
 
 	//identifica qual será o próximo processo e executa ele
-	public void executarProximoProcesso() {
+	public synchronized void executarProximoProcesso() {
 		Processo proximoProcesso = getProximoProcesso();
 
 		//caso nenhum próximo processo seja encontrado, avisa o FilaHandler injetado que não há mais processos na fila e retorna
 		if (proximoProcesso == null) {
 			_handler.onEsvaziada();
 			return;
+		}
+
+		//se o proximoProcesso não for o processoAtual
+		if (processoAtual != null && threadAtual != null && !proximoProcesso.equals(processoAtual)) {
+			//interrompe a thread que executa o processoAtual
+			threadAtual.interrupt();
 		}
 
 		executar(proximoProcesso);
@@ -76,7 +87,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public void onFinalizado(Processo processo) {
+	public synchronized void onFinalizado(Processo processo) {
 		//vai remover o processo atual
 		processos.remove(processo);
 
@@ -85,24 +96,34 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public Void addProcesso(Processo processo) {
+	public void onInterrompido(Processo processo) {
+		//o trabalho do algoritmo é justamente não deixar de executar processos,
+		//e justamente por isso, é necessário executar um novo processo sempre que haja um interrupção, independente da causa dela
+		executarProximoProcesso();
+	}
+
+	@Override
+	public synchronized Void addProcesso(Processo processo) {
+		processo.setHandler(this);
 		processos.add(processo);
 		return null;
 	}
 
 	@Override
-	public Void addProcessos(ArrayList<Processo> processos) {
-		this.processos.addAll(processos);
+	public synchronized Void addProcessos(ArrayList<Processo> processos) {
+		for (Processo processo : processos) {
+			addProcesso(processo);
+		}
 		return null;
 	}
 
 	@Override
-	public int countProcessos() {
+	public synchronized int countProcessos() {
 		return processos.size();
 	}
 
 	@Override
-	public long countTempoRestante() {
+	public synchronized long countTempoRestante() {
 		long tempoRestanteAcumulado = 0;
 
 		for (Processo processo : processos) {
@@ -113,7 +134,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public ArrayList<Processo> getProcessos() {
+	public synchronized ArrayList<Processo> getProcessos() {
 		return processos;
 	}
 

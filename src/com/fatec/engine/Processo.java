@@ -13,11 +13,14 @@ public class Processo implements Runnable {
 	private long tempoDecorrido;
 	private ProcessoHandler _handler;
 
-	public Processo(ProcessoHandler handler, long tempoEstimado) {
-		_handler = handler;
+	public Processo(long tempoEstimado) {
 		this.tempoEstimado = tempoEstimado;
 		tempoDecorrido = 0;
 		id = UUID.randomUUID();
+	}
+
+	public void setHandler(ProcessoHandler handler) {
+		_handler = handler;
 	}
 
 	public long getTempoRestante() {

@@ -1,7 +1,6 @@
 package com.fatec.engine.filas;
 
-import java.util.Comparator;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fatec.engine.Fila;
 import com.fatec.engine.Processo;
@@ -14,17 +13,38 @@ public class FilaSJF extends Fila {
 		super(handler, priority);
 	}
 
-	@Override
-	protected synchronized Processo getProximoProcesso() {
-		Processo proximoProcesso = null;
+	private Processo getMenorTempoRestante() {
+		int quantidadeItens = processos.size();
 
-		if(processos.size() > 0) {
-			//Ordena a fila por tempo de processo
-			processos.sort(menorTempo);
-			proximoProcesso = processos.get(0);
+		if (quantidadeItens == 0) {
+			return null;
 		}
 
-		return proximoProcesso;
+		Processo menor = processos.get(0);
+
+		for (int i = 1; i < quantidadeItens; i++) {
+			Processo atual = processos.get(i);
+
+			if (atual.getTempoRestante() < menor.getTempoRestante()) {
+				menor = atual;
+			}
+		}
+
+		return menor;
+	}
+
+	@Override
+	protected synchronized Processo getProximoProcesso() {
+		// Processo proximoProcesso = null;
+
+		// if(processos.size() > 0) {
+		// 	//Ordena a fila por tempo de processo
+		// 	processos.sort(Processo.tempoRestanteComparator);
+		// 	proximoProcesso = processos.get(0);
+		// }
+
+		// return proximoProcesso;
+		return getMenorTempoRestante();
 	}
 
 	public Void addProcesso(Processo processo) {
@@ -39,22 +59,9 @@ public class FilaSJF extends Fila {
 		return null;
 	}
 
-	public Void addProcessos(ArrayList<Processo> processos) {
-		super.addProcessos(processos);
+	public Void addProcessos(CopyOnWriteArrayList<Processo> processos) {
 
 		executarProximoProcesso();
 		return null;
 	}
-
-	public Comparator<Processo> menorTempo = new Comparator<Processo>() {
-		
-		@Override
-		public synchronized int compare(Processo p0, Processo p1) {
-			if(p0.getTempoRestante() < p1.getTempoRestante()) {
-				return +1;
-			} else {
-				return -1;
-			}
-		}
-	};
 }

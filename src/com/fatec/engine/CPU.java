@@ -1,8 +1,8 @@
 package com.fatec.engine;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fatec.engine.enums.Prioridade;
 import com.fatec.engine.filas.FilaFCFS;
@@ -70,8 +70,12 @@ public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel
 			}
 		}
 
+		//se não há proximaFila, retorna
 		if (proximaFila == null) {
-			filaAtual.pausar();
+			//mas se filaAtual existir, encerra ela antes
+			if (filaAtual != null) {
+				filaAtual.pausar();
+			}
 			return;
 		}
 
@@ -109,6 +113,12 @@ public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel
 		_handler.onNovoProcesso(processo, this);
 	}
 
+	//método chamado pelas filas quando um processo é finalizado
+	@Override
+	public void onProcessoFinalizado(Processo processo) {
+		_handler.onProcessoFinalizado(processo, this);
+	}
+
 	@Override
 	public long countTempoRestante() {
 		long tempoRestanteAcumulado = 0;
@@ -132,8 +142,8 @@ public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel
 	}
 
 	@Override
-	public ArrayList<Processo> getProcessos() {
-		ArrayList<Processo> processos = new ArrayList<Processo>();
+	public CopyOnWriteArrayList<Processo> getProcessos() {
+		CopyOnWriteArrayList<Processo> processos = new CopyOnWriteArrayList<Processo>();
 
 		for (Fila fila : filas) {
 			processos.addAll(fila.getProcessos());
@@ -149,7 +159,7 @@ public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel
 	}
 
 	@Override
-	public Atualizavel addProcessos(ArrayList<Processo> processos) {
+	public Atualizavel addProcessos(CopyOnWriteArrayList<Processo> processos) {
 		for (Processo processo : processos) {
 			addProcesso(processo);
 		}

@@ -2,9 +2,9 @@ package com.fatec.engine.filas;
 
 import java.util.Comparator;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fatec.engine.Fila;
 import com.fatec.engine.Processo;
@@ -58,7 +58,7 @@ public class FilaPrioridades extends Fila {
 	}
 
 	@Override
-	public Void addProcessos(ArrayList<Processo> processos) {
+	public Void addProcessos(CopyOnWriteArrayList<Processo> processos) {
 		super.addProcessos(processos);
 
 		Collections.sort(processos, maiorPrioridade);

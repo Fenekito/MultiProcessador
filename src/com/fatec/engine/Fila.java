@@ -1,7 +1,7 @@
 package com.fatec.engine;
 
-import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fatec.engine.enums.Prioridade;
 import com.fatec.engine.interfaces.Administravel;
@@ -13,7 +13,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	protected FilaHandler _handler;
 	protected Thread threadAtual;
 	protected Processo processoAtual;
-	protected ArrayList<Processo> processos;
+	protected CopyOnWriteArrayList<Processo> processos;
 	protected boolean rodando; 
 	public UUID id;
 	public Prioridade prioridade;
@@ -23,7 +23,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 		_handler = handler;
 		this.prioridade = prioridade;
 		rodando = false;
-		processos = new ArrayList<Processo>();
+		processos = new CopyOnWriteArrayList<Processo>();
 	}
 
 	public synchronized void iniciar() {
@@ -33,8 +33,11 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 
 	public synchronized void pausar() {
 		rodando = false;
-		threadAtual.interrupt();
-		threadAtual = null;
+
+		if (threadAtual != null) {
+			threadAtual.interrupt();
+			threadAtual = null;
+		}
 	}
 	
 	public synchronized boolean estaRodando() {
@@ -44,6 +47,12 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	protected synchronized void executar(Processo processo) {
 		_handler.onNovoProcesso(processo);
 		processoAtual = processo;
+		
+		//se houver uma thread em execução, interrompe ela antes de executar a próxima
+		if (threadAtual != null) {
+			threadAtual.interrupt();
+		}
+
 		threadAtual = new Thread(processo);
 		threadAtual.start();
 	}
@@ -58,10 +67,9 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 			return;
 		}
 
-		//se o proximoProcesso não for o processoAtual
-		if (processoAtual != null && threadAtual != null && !proximoProcesso.equals(processoAtual)) {
-			//interrompe a thread que executa o processoAtual
-			threadAtual.interrupt();
+		//se o proximoProcesso for o processoAtual, não há nada a ser feito, portanto, retorna
+		if (proximoProcesso.equals(processoAtual)) {
+			return;
 		}
 
 		executar(proximoProcesso);
@@ -88,6 +96,8 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 
 	@Override
 	public synchronized void onFinalizado(Processo processo) {
+		_handler.onProcessoFinalizado(processo);
+		
 		//vai remover o processo atual
 		processos.remove(processo);
 
@@ -110,7 +120,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public synchronized Void addProcessos(ArrayList<Processo> processos) {
+	public synchronized Void addProcessos(CopyOnWriteArrayList<Processo> processos) {
 		for (Processo processo : processos) {
 			addProcesso(processo);
 		}
@@ -134,7 +144,7 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public synchronized ArrayList<Processo> getProcessos() {
+	public synchronized CopyOnWriteArrayList<Processo> getProcessos() {
 		return processos;
 	}
 

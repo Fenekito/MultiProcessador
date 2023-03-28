@@ -6,5 +6,6 @@ import com.fatec.engine.Processo;
 
 public interface CPUHandler {
 	public void onNovoProcesso(Processo processo, CPU cpu);
+	public void onProcessoFinalizado(Processo processo, CPU cpu);
 	public void onNovaFila(Fila fila, CPU cpu);
 }

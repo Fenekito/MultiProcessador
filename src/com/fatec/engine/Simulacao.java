@@ -17,24 +17,30 @@ public class Simulacao {
 
 		@Override
 		public void onNovoProcesso(Processo processo, CPU cpu) {
-			String msg = String.format("[novo_processo] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString());
+			String msg = String.format("[novo_processo] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado());
+			System.out.println(msg);
+		}
+
+		@Override
+		public void onProcessoFinalizado(Processo processo, CPU cpu) {
+			String msg = String.format("[processo_finalizado] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado());
 			System.out.println(msg);
 		}
 	}
 
     public static void main(String[] args) {
 		Logger logger = new Logger();
-		CPUController controller = new CPUController(logger, 4);
-		Prioridade prioridade = Prioridade.SECONDARY;
+		CPUController controller = new CPUController(logger, 1);
+		Prioridade prioridade = Prioridade.OS;
 
 		//adiciona 1000 processos, com um tempo de execução variando de 1 a 1000 e prioridade variavel
-		for (int i = 1; i <= 1000; i++) {
+		for (int i = 10; i > 0; i--) {
 			Processo processo = new Processo(i);
 			processo.prioridade = prioridade;
 
 			controller.addProcesso(processo);
 			
-			prioridade = prioridade.tiltNext();
+			//prioridade = prioridade.tiltNext();
 		}
 	}
 }

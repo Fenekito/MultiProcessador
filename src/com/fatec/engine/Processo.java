@@ -26,6 +26,10 @@ public class Processo implements Runnable {
 	public long getTempoRestante() {
 		return tempoEstimado - tempoDecorrido;
 	}
+
+	public long getTempoEstimado() {
+		return tempoEstimado;
+	}
 	
 	public static Comparator<Processo> priorityComparator = new Comparator<Processo>() {
 		
@@ -34,13 +38,17 @@ public class Processo implements Runnable {
 			int prioridadeP0 = p0.prioridade.toInt();
 			int prioridadeP1 = p1.prioridade.toInt();
 
-			int diferenca = prioridadeP0 - prioridadeP1;
-
-			return diferenca != 0
-				? diferenca / Math.abs(diferenca)
-				: 0;
+			return Integer.compare(prioridadeP0, prioridadeP1);
 		}
 
+	};
+
+	public static Comparator<Processo> tempoRestanteComparator = new Comparator<Processo>() {
+		
+		@Override
+		public synchronized int compare(Processo p0, Processo p1) {
+			return Long.compare(p0.getTempoRestante(), p1.getTempoRestante());
+		}
 	};
 
 	@Override

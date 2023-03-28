@@ -9,4 +9,7 @@ public interface FilaHandler {
   
 	//método que a fila chamará sempre que ela iniciar a execução de um novo processo
 	public void onNovoProcesso(Processo processo);
+	
+	//método que a fila chamará sempre que um processo dentro dela for finalizado
+	public void onProcessoFinalizado(Processo processo);
 }

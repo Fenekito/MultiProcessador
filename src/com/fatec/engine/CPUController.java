@@ -1,6 +1,7 @@
 package com.fatec.engine;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fatec.engine.interfaces.Administravel;
 import com.fatec.engine.interfaces.CPUHandler;
@@ -61,8 +62,8 @@ public class CPUController implements Administravel<Void> {
 	}
 
 	@Override
-	public ArrayList<Processo> getProcessos() {
-		ArrayList<Processo> processos = new ArrayList<Processo>();
+	public CopyOnWriteArrayList<Processo> getProcessos() {
+		CopyOnWriteArrayList<Processo> processos = new CopyOnWriteArrayList<Processo>();
 
 		for (CPU cpu : cpus) {
 			processos.addAll(cpu.getProcessos());
@@ -81,7 +82,7 @@ public class CPUController implements Administravel<Void> {
 	}
 
 	@Override
-	public Void addProcessos(ArrayList<Processo> processos) {
+	public Void addProcessos(CopyOnWriteArrayList<Processo> processos) {
 		for (Processo processo : processos) {
 			getCPUMenosUsada().addProcesso(processo);
 		}

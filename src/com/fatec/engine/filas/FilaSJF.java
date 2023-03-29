@@ -34,7 +34,7 @@ public class FilaSJF extends Fila {
 	}
 
 	@Override
-	protected synchronized Processo getProximoProcesso() {
+	protected Processo getProximoProcesso() {
 		// Processo proximoProcesso = null;
 
 		// if(processos.size() > 0) {

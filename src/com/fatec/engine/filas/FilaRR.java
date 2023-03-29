@@ -19,7 +19,7 @@ public class FilaRR extends Fila {
 		}
 	}
 
-	public long quantum = 80;
+	public long quantum = 5;
 
 	public FilaRR(FilaHandler handler, Prioridade prioridade) {
 		super(handler, prioridade);
@@ -28,6 +28,33 @@ public class FilaRR extends Fila {
 	public FilaRR(FilaHandler handler, Prioridade prioridade, long quantum) {
 		super(handler, prioridade);
 		this.quantum = quantum;
+	}
+
+	private void resetarClock() {
+		clock.cancel();
+		clock = new Timer();
+		clock.scheduleAtFixedRate(new _clockTask(), quantum, quantum);
+	}
+
+	@Override
+	public void iniciar() {
+		super.iniciar();
+		
+		resetarClock();
+	}
+
+	@Override
+	public void pausar() {
+		super.pausar();
+
+		clock.cancel();
+	}
+
+	@Override
+	public void onFinalizado(Processo processo) {
+		super.onFinalizado(processo);
+
+		resetarClock();
 	}
 
 	@Override
@@ -41,11 +68,6 @@ public class FilaRR extends Fila {
 		int indexProcessoAtual = processos.indexOf(processoAtual);
 		int quantidadeProcessos = processos.size();
 		int indexProximoProcesso = (indexProcessoAtual + 1) % quantidadeProcessos;
-		
-		//cancela o timer antigo e cria outro
-		clock.cancel();
-		clock = new Timer();
-		clock.schedule(new _clockTask(), quantum);
 
 		return processos.get(indexProximoProcesso);
 	}

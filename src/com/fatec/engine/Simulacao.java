@@ -17,13 +17,13 @@ public class Simulacao {
 
 		@Override
 		public void onNovoProcesso(Processo processo, CPU cpu) {
-			String msg = String.format("[novo_processo] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado());
+			String msg = String.format("[novo_processo] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d, Processo.tempoRestante: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado(), processo.getTempoRestante());
 			System.out.println(msg);
 		}
 
 		@Override
 		public void onProcessoFinalizado(Processo processo, CPU cpu) {
-			String msg = String.format("[processo_finalizado] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado());
+			String msg = String.format("[processo_finalizado] CPU.id: %s, Processo.id: %s, Processo.prioridade: %s, Processo.tempoEstimado: %d, Processo.tempoRestante: %d", cpu.id.toString(), processo.id.toString(), processo.prioridade.toString(), processo.getTempoEstimado(), processo.getTempoRestante());
 			System.out.println(msg);
 		}
 	}
@@ -31,7 +31,7 @@ public class Simulacao {
     public static void main(String[] args) {
 		Logger logger = new Logger();
 		CPUController controller = new CPUController(logger, 1);
-		Prioridade prioridade = Prioridade.OS;
+		Prioridade prioridade = Prioridade.INTERACTIVE;
 
 		//adiciona 1000 processos, com um tempo de execução variando de 1 a 1000 e prioridade variavel
 		for (int i = 10; i > 0; i--) {

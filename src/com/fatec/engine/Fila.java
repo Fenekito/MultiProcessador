@@ -26,12 +26,12 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 		processos = new CopyOnWriteArrayList<Processo>();
 	}
 
-	public synchronized void iniciar() {
+	public void iniciar() {
 		rodando = true;
 		executarProximoProcesso();
 	}
 
-	public synchronized void pausar() {
+	public void pausar() {
 		rodando = false;
 
 		if (threadAtual != null) {
@@ -40,21 +40,22 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 		}
 	}
 	
-	public synchronized boolean estaRodando() {
+	public boolean estaRodando() {
 		return rodando;
 	}
 
 	protected synchronized void executar(Processo processo) {
-		_handler.onNovoProcesso(processo);
 		processoAtual = processo;
 		
 		//se houver uma thread em execução, interrompe ela antes de executar a próxima
 		if (threadAtual != null) {
 			threadAtual.interrupt();
 		}
-
+		
 		threadAtual = new Thread(processo);
 		threadAtual.start();
+		
+		_handler.onNovoProcesso(processo);
 	}
 
 	//identifica qual será o próximo processo e executa ele
@@ -106,7 +107,13 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public void onInterrompido(Processo processo) {
+	public synchronized void onInterrompido(Processo processo) {
+		//antes de qualquer coisa, checa se o processo já não excedeu o seu tempo limite de execução
+		// if (processo.getTempoRestante() <= 0) {
+		// 	onFinalizado(processo);
+		// 	return;
+		// }
+
 		//o trabalho do algoritmo é justamente não deixar de executar processos,
 		//e justamente por isso, é necessário executar um novo processo sempre que haja um interrupção, independente da causa dela
 		executarProximoProcesso();
@@ -128,12 +135,12 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 	}
 
 	@Override
-	public synchronized int countProcessos() {
+	public int countProcessos() {
 		return processos.size();
 	}
 
 	@Override
-	public synchronized long countTempoRestante() {
+	public long countTempoRestante() {
 		long tempoRestanteAcumulado = 0;
 
 		for (Processo processo : processos) {

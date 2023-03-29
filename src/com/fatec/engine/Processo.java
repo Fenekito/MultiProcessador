@@ -2,6 +2,7 @@ package com.fatec.engine;
 
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.fatec.engine.enums.Prioridade;
 import com.fatec.engine.interfaces.ProcessoHandler;
@@ -24,7 +25,7 @@ public class Processo implements Runnable {
 	}
 
 	public long getTempoRestante() {
-		return tempoEstimado - tempoDecorrido;
+		return tempoEstimado - TimeUnit.NANOSECONDS.toMillis(tempoDecorrido);
 	}
 
 	public long getTempoEstimado() {

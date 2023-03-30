@@ -13,7 +13,7 @@ import com.fatec.engine.interfaces.Atualizavel;
 import com.fatec.engine.interfaces.CPUHandler;
 import com.fatec.engine.interfaces.FilaHandler;
 
-public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel {
+public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel, Runnable {
 
 	private Fila[] filas = new Fila[5];
 	private Fila filaAtual;
@@ -33,13 +33,14 @@ public class CPU implements Administravel<Atualizavel>, FilaHandler, Atualizavel
 	public static Comparator<CPU> tempoRestanteComparator = new Comparator<CPU>() {
 		@Override
 		public int compare(CPU cpu0, CPU cpu1) {
-			long diferenca =  cpu0.countTempoRestante() - cpu1.countTempoRestante();
-			
-			return diferenca != 0
-				? (int)(diferenca / Math.abs(diferenca))
-				: 0;
+			return Long.compare(cpu0.countTempoRestante(), cpu1.countTempoRestante());
 		}
-	};	
+	};
+
+	@Override
+	public void run() {
+		
+	}
 
 	@Override
 	public boolean equals(Object objeto) {

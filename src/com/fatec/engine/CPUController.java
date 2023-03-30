@@ -2,6 +2,8 @@ package com.fatec.engine;
 
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.fatec.engine.interfaces.Administravel;
 import com.fatec.engine.interfaces.CPUHandler;
@@ -10,13 +12,11 @@ public class CPUController implements Administravel<Void> {
 
 	private ArrayList<CPU> cpus = new ArrayList<CPU>();
 	private CPUHandler _handler;
-
-	public CPUController(CPUHandler handler) {
-		_handler = handler;
-	}
+	private ExecutorService _executor;
 	
 	public CPUController(CPUHandler handler, int cpuCount) {
 		_handler = handler;
+		_executor = Executors.newFixedThreadPool(cpuCount);
 		addCPU(cpuCount);
 	}
 
@@ -26,17 +26,14 @@ public class CPUController implements Administravel<Void> {
 		return cpus.get(0);
 	}
 
-	public void addCPU(int count) {
+	private void addCPU(int count) {
 		int realCount = count;
 
 		for (int i = 0; i < realCount; i++) {
 			CPU cpu = new CPU(_handler);
 			cpus.add(cpu);
+			_executor.execute(cpu);
 		}
-	}
-
-	public void addCPU() {
-		addCPU(1);
 	}
 
 	@Override

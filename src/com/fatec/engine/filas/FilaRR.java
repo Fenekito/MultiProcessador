@@ -15,11 +15,15 @@ public class FilaRR extends Fila {
 	private class _clockTask extends TimerTask {
 		@Override
 		public void run() {
-			executarProximoProcesso();
+			if (threadAtual != null) {
+				threadAtual.interrupt();
+			} else if (processos.size() > 0) {
+				executarProximoProcesso();
+			}
 		}
 	}
 
-	public long quantum = 5;
+	public long quantum = 50;
 
 	public FilaRR(FilaHandler handler, Prioridade prioridade) {
 		super(handler, prioridade);

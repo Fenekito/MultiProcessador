@@ -108,15 +108,11 @@ public abstract class Fila implements Administravel<Void>, ProcessoHandler {
 
 	@Override
 	public synchronized void onInterrompido(Processo processo) {
-		//antes de qualquer coisa, checa se o processo já não excedeu o seu tempo limite de execução
-		// if (processo.getTempoRestante() <= 0) {
-		// 	onFinalizado(processo);
-		// 	return;
-		// }
-
 		//o trabalho do algoritmo é justamente não deixar de executar processos,
 		//e justamente por isso, é necessário executar um novo processo sempre que haja um interrupção, independente da causa dela
-		executarProximoProcesso();
+		if (rodando) {
+			executarProximoProcesso();
+		}
 	}
 
 	@Override

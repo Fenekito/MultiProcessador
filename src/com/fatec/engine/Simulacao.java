@@ -30,17 +30,16 @@ public class Simulacao {
 
     public static void main(String[] args) {
 		Logger logger = new Logger();
-		CPUController controller = new CPUController(logger, 1);
-		Prioridade prioridade = Prioridade.INTERACTIVE;
+		CPUController controller = new CPUController(logger, 4);
+		Prioridade prioridade = Prioridade.OS;
 
-		//adiciona 1000 processos, com um tempo de execução variando de 1 a 1000 e prioridade variavel
-		for (int i = 10; i > 0; i--) {
+		for (int i = 400; i > 0; i--) {
 			Processo processo = new Processo(i);
 			processo.prioridade = prioridade;
 
 			controller.addProcesso(processo);
 			
-			//prioridade = prioridade.tiltNext();
+			prioridade = prioridade.tiltNext();
 		}
 	}
 }

@@ -30,10 +30,10 @@ public class Simulacao {
 
     public static void main(String[] args) {
 		Logger logger = new Logger();
-		CPUController controller = new CPUController(logger, 4);
+		CPUController controller = new CPUController(logger, 5);
 		Prioridade prioridade = Prioridade.OS;
 
-		for (int i = 400; i > 0; i--) {
+		for (int i = 50; i > 0; i--) {
 			Processo processo = new Processo(i);
 			processo.prioridade = prioridade;
 

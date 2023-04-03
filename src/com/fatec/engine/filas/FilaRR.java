@@ -23,7 +23,7 @@ public class FilaRR extends Fila {
 		}
 	}
 
-	public long quantum = 50;
+	public long quantum = 10;
 
 	public FilaRR(FilaHandler handler, Prioridade prioridade) {
 		super(handler, prioridade);

@@ -13,7 +13,8 @@ public class FilaSJF extends Fila {
 		super(handler, priority);
 	}
 
-	private Processo getMenorTempoRestante() {
+	@Override
+	protected Processo getProximoProcesso() {
 		int quantidadeItens = processos.size();
 
 		if (quantidadeItens == 0) {
@@ -33,20 +34,6 @@ public class FilaSJF extends Fila {
 		return menor;
 	}
 
-	@Override
-	protected Processo getProximoProcesso() {
-		// Processo proximoProcesso = null;
-
-		// if(processos.size() > 0) {
-		// 	//Ordena a fila por tempo de processo
-		// 	processos.sort(Processo.tempoRestanteComparator);
-		// 	proximoProcesso = processos.get(0);
-		// }
-
-		// return proximoProcesso;
-		return getMenorTempoRestante();
-	}
-
 	public Void addProcesso(Processo processo) {
 		super.addProcesso(processo);
 
@@ -60,7 +47,7 @@ public class FilaSJF extends Fila {
 	}
 
 	public Void addProcessos(CopyOnWriteArrayList<Processo> processos) {
-
+		super.addProcessos(processos);
 		executarProximoProcesso();
 		return null;
 	}

@@ -69,10 +69,9 @@ public class Processo implements Runnable {
 	@Override
 	public void run() {
 		long timestampInicio = System.nanoTime();
-		long tempoRestante = getTempoRestante();
 
 		try {
-			Thread.sleep(tempoRestante);
+			Thread.sleep(getTempoRestante());
 		} catch (Exception e) {
 			long timestampPausa = System.nanoTime();
 			long tempoDecorridoAtePausa = timestampPausa - timestampInicio;

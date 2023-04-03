@@ -20,16 +20,13 @@ public class CPUController implements Administravel<Void> {
 		addCPU(cpuCount);
 	}
 
-
 	private CPU getCPUMenosUsada() {
 		cpus.sort(CPU.tempoRestanteComparator);
 		return cpus.get(0);
 	}
 
 	private void addCPU(int count) {
-		int realCount = count;
-
-		for (int i = 0; i < realCount; i++) {
+		for (int i = 0; i < count; i++) {
 			CPU cpu = new CPU(_handler);
 			cpus.add(cpu);
 			_executor.execute(cpu);

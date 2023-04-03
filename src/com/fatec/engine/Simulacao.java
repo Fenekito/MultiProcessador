@@ -8,10 +8,10 @@ import com.fatec.engine.interfaces.CPUHandler;
 */
 
 public class Simulacao {
-	private static class Logger implements CPUHandler {
+	private static class Logger implements CPUHandler { 
 		@Override
 		public void onNovaFila(Fila fila, CPU cpu) {
-			String msg = String.format("[nova_fila] CPU.id: %s, Fila.id: %s, Fila.prioridade: %s", cpu.id.toString(), fila.id.toString(), fila.prioridade.toString());
+			String msg = String.format("[nova_fila_selecionada] CPU.id: %s, Fila.id: %s, Fila.prioridade: %s", cpu.id.toString(), fila.id.toString(), fila.prioridade.toString());
 			System.out.println(msg);
 		}
 
